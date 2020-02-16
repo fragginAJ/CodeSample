@@ -1,0 +1,12 @@
+//
+//  Config.sample.xcconfig
+//  CodeSample
+//
+//  Created by Alejandro Fragoso on 2/16/20.
+//  Copyright © 2020 AJ Fragoso. All rights reserved.
+//
+
+// Configuration settings file format documentation can be found at:
+// https://help.apple.com/xcode/#/dev745c5c974
+
+FLICKR_API_KEY = XXXXX
