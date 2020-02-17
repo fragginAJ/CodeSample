@@ -10,6 +10,8 @@ Nearby Photos is a simple app that displays 20 photos that were uploaded to Flic
     Make a copy of `Config.sample.xcconfig` and name it `Config.xcconfig`. Add it to the project, update `FLICKR_API_KEY` with your key, and set the new file as the project's configuration file. We do this because `Config.xcconfig` has been added to the `gitignore`, which prevents API keys from ever being committed!
     
     (Alternatively, you can just set `FLICKR_API_KEY` in the `Config.sample.xcconfig` file to get going.)
+    
+    ![Config](https://github.com/fragginAJ/CodeSample/blob/master/DocumentationAssets/configMenu.png?raw=true "Config")
 4. Set build device to be a simulator so we don't have to deal with code signing.
 
     Set the simulator location (or not!).
@@ -18,6 +20,8 @@ Nearby Photos is a simple app that displays 20 photos that were uploaded to Flic
 ---
 
 ## Functionality
+
+![Demo](https://github.com/fragginAJ/CodeSample/blob/master/DocumentationAssets/sampleDemo.gif?raw=true "Demo")
 
 The app attempts to get the device location before searching Flickr for photos uploaded in the vicinity. It will default to trending photos in the absence of a location.
 
