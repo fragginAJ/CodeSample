@@ -8,16 +8,37 @@
 
 import Foundation
 import CoreLocation
+import UIKit
+
+/// `LocatorViewModelDelegate` alerts the delegated view controller of location changes.
+protocol LocatorViewModelDelegate: UIViewController {
+    func foundNewLocationName()
+    func failedToFindLocation(_ error: Error)
+}
 
 /// `LocatorViewModel` is the view model of `LocatorViewController`, used to manage networking and `CoreLocation`
 /// flows before ultimately notifying the controller of the results.
-class LocatorViewModel {
-	var controller: LocatorViewController?
-	private var geolocating = false
+final class LocatorViewModel {
+    
+    // MARK: internal properties
+    var photos: [FlickrPhoto] = []
+    var locationName: String = ""
+    weak var delegate: LocatorViewModelDelegate?
+    let flickrProvider: FlickrProvider
+    
+    // MARK: private properties
+	private var isGeolocating = false
 
+    // MARK: initializers
+    init(delegate: LocatorViewModelDelegate? = nil, flickrProvider: FlickrProvider = NetworkClient.shared) {
+        self.delegate = delegate
+        self.flickrProvider = flickrProvider
+    }
+    
+    // MARK: internal functions
 	func geolocate() {
 		GeolocationManager.shared.delegate = self
-		geolocating = true
+		isGeolocating = true
 
 		if let currentLocation = GeolocationManager.shared.currentLocation {
 			locationDidUpdate(currentLocation)
@@ -26,50 +47,47 @@ class LocatorViewModel {
 		}
 	}
 
-	func requestPhotos() {
-		if let location = GeolocationManager.shared.currentLocation {
-			NetworkClient.shared.searchPhotos(latitude: location.coordinate.latitude,
-											  longitude: location.coordinate.longitude,
-											  completionHandler: { [weak self] (photos, error) in
-												if let error = error {
-													self?.controller?.showAlert(title: "Uh oh. Something's wrong",
-																					 message: error.localizedDescription,
-																					 acknowledgement: "OK")
-												} else {
-													self?.controller?.didUpdatePhotos(photos)
-												}
-			})
-		} else {
-			NetworkClient.shared.trendingPhotos { [weak self] (photos, error) in
-				if let error = error {
-					self?.controller?.showAlert(title: "Uh oh. Something's wrong",
-													 message: error.localizedDescription,
-													 acknowledgement: "OK")
-				} else {
-					self?.controller?.didUpdatePhotos(photos)
-				}
-			}
-		}
+    func requestPhotos(completion: @escaping (Error?) -> Void) {
+        if let location = GeolocationManager.shared.currentLocation {
+            // TODO: inject the network client
+            NetworkClient.shared.searchPhotos(
+                latitude: location.coordinate.latitude,
+                longitude: location.coordinate.longitude
+            ) { [weak self] (photos, error) in
+                guard let self else { return }
+                self.photos = photos
+                
+                completion(error)
+            }
+        } else {
+            NetworkClient.shared.trendingPhotos { [weak self] (photos, error) in
+                guard let self else { return }
+                self.photos = photos
+                
+                completion(error)
+            }
+        }
 	}
 }
 
 // MARK: - `GeolocationManagerDelegate` -
 extension LocatorViewModel: GeolocationManagerDelegate {
 	func locationDidUpdate(_ location: CLLocation) {
-		guard geolocating else { return }
+		guard isGeolocating else { return }
 
-		GeolocationManager.shared.reverseGeocodeLocationName(from: location) { [unowned self] (locationName, error) in
-			guard error == nil,
-				let locationName = locationName else {
-					self.controller?.showAlert(title: "Uh oh. Something's wrong",
-													message: error.debugDescription,
-													acknowledgement: "OK")
-					return
-			}
+		GeolocationManager.shared.reverseGeocodeLocationName(
+            from: location
+        ) { [weak self] (locationName, error) in
+            guard let self else { return }
 
-			self.controller?.updateLocationName(locationName)
-			self.geolocating = false
-			self.requestPhotos()
+            self.isGeolocating = false
+            
+            if let error {
+                delegate?.failedToFindLocation(error)
+            } else if let locationName {
+                self.locationName = locationName
+                delegate?.foundNewLocationName()
+            }
 		}
 	}
 }
