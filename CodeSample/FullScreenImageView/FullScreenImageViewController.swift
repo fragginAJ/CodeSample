@@ -13,7 +13,7 @@ import AlamofireImage
 
 /// `FullScreenImageViewController` displays a high quality Flickr image selected by the user and affords basic zooming
 /// capabilities.
-class FullScreenImageViewController: UIViewController {
+final class FullScreenImageViewController: UIViewController {
 	private let blurEffectView = UIVisualEffectView(effect: UIBlurEffect(style: .dark))
 	private let scrollContainerView = UIView()
 	private let imageScrollView = UIScrollView()
@@ -22,11 +22,11 @@ class FullScreenImageViewController: UIViewController {
 	private let titleLabel = UILabel()
 	private let closeButton = UIButton()
 	private let activityIndicator = UIActivityIndicatorView()
-	private let photo: FlickrPhoto
+    private let viewModel: FullScreenImageViewModel
 
 	// MARK: initializers
-	init(photo: FlickrPhoto) {
-		self.photo = photo
+	init(viewModel: FullScreenImageViewModel) {
+		self.viewModel = viewModel
 		super.init(nibName: nil, bundle: nil)
 	}
 
@@ -34,6 +34,7 @@ class FullScreenImageViewController: UIViewController {
 		fatalError("init(coder:) has not been implemented")
 	}
 
+    // MARK: view lifecycle
 	override func viewDidLoad() {
 		super.viewDidLoad()
 
@@ -50,43 +51,48 @@ class FullScreenImageViewController: UIViewController {
 		drawTitleGradientLayer()
 	}
 
-	// MARK: internal functions
-	func loadHighQualityPhoto() {
-		guard let photoURL = URL(string: photo.source(size: FlickrPhoto.Size.large1024)) else {
+    // MARK: private functions
+	private func loadHighQualityPhoto() {
+        guard let photoURL = viewModel.highQualityPhotoURL else {
 			return
 		}
 
 		activityIndicator.startAnimating()
 
-		imageView.af_setImage(withURL: photoURL,
-							  imageTransition: .crossDissolve(0.25),
-							  runImageTransitionIfCached: false) { [weak self] (response) in
-								if response.error != nil {
-									self?.loadDefaultPhoto()
-								} else {
-									self?.activityIndicator.stopAnimating()
-								}
+		imageView.af_setImage(
+            withURL: photoURL,
+            imageTransition: .crossDissolve(0.25),
+            runImageTransitionIfCached: false
+        ) { [weak self] (response) in
+            guard let self else { return }
+            if response.error != nil {
+                self.loadDefaultPhoto()
+            } else {
+                self.activityIndicator.stopAnimating()
+            }
 		}
 	}
 
-	func loadDefaultPhoto() {
-		guard let photoURL = URL(string: photo.source()) else {
+	private func loadDefaultPhoto() {
+        guard let photoURL = viewModel.standardQualityPhotoURL else {
 			return
-		}
+        }
+        
+        imageView.af_setImage(
+            withURL: photoURL,
+            imageTransition: .crossDissolve(0.25),
+            runImageTransitionIfCached: false
+        ) { [weak self] (response) in
+            guard let self else { return }
+            self.activityIndicator.stopAnimating()
+            if let error = response.error {
+                self.showAlert(title: "Failed to load the photo",
+                               message: error.localizedDescription,
+                               acknowledgement: "OK")
+            }
+        }
+    }
 
-		imageView.af_setImage(withURL: photoURL,
-							  imageTransition: .crossDissolve(0.25),
-							  runImageTransitionIfCached: false) { [weak self] (response) in
-								self?.activityIndicator.stopAnimating()
-								if let error = response.error {
-									self?.showAlert(title: "Failed to load the photo",
-																	 message: error.localizedDescription,
-																	 acknowledgement: "OK")
-								}
-		}
-	}
-
-	// MARK: private functions
 	private func drawTitleGradientLayer() {
 		let gradient = CAGradientLayer()
 		gradient.frame = titleContainerView.bounds
@@ -97,6 +103,16 @@ class FullScreenImageViewController: UIViewController {
 
 // MARK: - `ViewBuilder`
 extension FullScreenImageViewController: ViewBuilder {
+    private enum Constants {
+        static let containerViewVerticalPadding: CFloat = 100
+        static let titleContainerHeight: CGFloat = 50
+        static let imageMinimumZoom: CGFloat = 1
+        static let imageMaximumZoom: CGFloat = 6
+        static let closeButtonLeadingPadding: CGFloat = 20
+        static let closeButtonTopPadding: CGFloat = 45
+        static let closeButtonHeight: CGFloat = 44
+    }
+    
 	func styleView() {
 		view.backgroundColor = .clear
 		modalTransitionStyle = .crossDissolve
@@ -113,7 +129,7 @@ extension FullScreenImageViewController: ViewBuilder {
 		addCloseButton()
 	}
 
-	func addBlurEffectView() {
+	private func addBlurEffectView() {
 		view.addSubview(blurEffectView)
 
 		blurEffectView.snp.makeConstraints { make in
@@ -121,21 +137,21 @@ extension FullScreenImageViewController: ViewBuilder {
 		}
 	}
 
-	func addScrollContainerView() {
+    private func addScrollContainerView() {
 		view.addSubview(scrollContainerView)
 		scrollContainerView.backgroundColor = .black
 
 		scrollContainerView.snp.makeConstraints { make in
 			make.leading.trailing.equalToSuperview()
-			make.top.equalTo(self.view.safeAreaInsets.top).offset(100)
-			make.bottom.equalTo(self.view.safeAreaInsets.bottom).inset(100)
+            make.top.equalTo(self.view.safeAreaInsets.top).offset(Constants.containerViewVerticalPadding)
+			make.bottom.equalTo(self.view.safeAreaInsets.bottom).inset(Constants.containerViewVerticalPadding)
 		}
 	}
 
-	func addImageScrollView() {
+    private func addImageScrollView() {
 		scrollContainerView.addSubview(imageScrollView)
-		imageScrollView.minimumZoomScale = 1.0
-		imageScrollView.maximumZoomScale = 6.0
+        imageScrollView.minimumZoomScale = Constants.imageMinimumZoom
+        imageScrollView.maximumZoomScale = Constants.imageMaximumZoom
 		imageScrollView.delegate = self
 
 		imageScrollView.snp.makeConstraints { make in
@@ -143,7 +159,7 @@ extension FullScreenImageViewController: ViewBuilder {
 		}
 	}
 
-	func addImageView() {
+    private func addImageView() {
 		imageScrollView.addSubview(imageView)
 		imageView.backgroundColor = .black
 		imageView.contentMode = .scaleAspectFit
@@ -154,17 +170,17 @@ extension FullScreenImageViewController: ViewBuilder {
 		}
 	}
 
-	func addTitleContainerView() {
+    private func addTitleContainerView() {
 		view.addSubview(titleContainerView)
 
 		titleContainerView.snp.makeConstraints { make in
 			make.leading.trailing.equalTo(scrollContainerView)
 			make.top.equalTo(scrollContainerView)
-			make.height.equalTo(50)
+            make.height.equalTo(Constants.titleContainerHeight)
 		}
 	}
 
-	func addTitleLabel() {
+    private func addTitleLabel() {
 		titleContainerView.addSubview(titleLabel)
 		titleLabel.numberOfLines = 2
 		titleLabel.textColor = .white
@@ -173,7 +189,7 @@ extension FullScreenImageViewController: ViewBuilder {
 		titleLabel.setContentHuggingPriority(.required, for: .vertical)
 		titleLabel.adjustsFontSizeToFitWidth = true
 		titleLabel.minimumScaleFactor = 0.75
-		titleLabel.text = photo.title
+        titleLabel.text = viewModel.photoTitle
 
 		titleLabel.snp.makeConstraints { make in
 			make.leading.trailing.equalToSuperview()
@@ -182,7 +198,7 @@ extension FullScreenImageViewController: ViewBuilder {
 		}
 	}
 
-	func addActivityIndicator() {
+    private func addActivityIndicator() {
 		view.addSubview(activityIndicator)
 		activityIndicator.style = .white
 
@@ -191,16 +207,16 @@ extension FullScreenImageViewController: ViewBuilder {
 		}
 	}
 
-	func addCloseButton() {
+    private func addCloseButton() {
 		view.addSubview(closeButton)
 		closeButton.setTitle("Close", for: .normal)
 		closeButton.setTitleColor(.white, for: .normal)
 		closeButton.setContentHuggingPriority(.required, for: .horizontal)
 
 		closeButton.snp.makeConstraints { make in
-			make.leading.equalToSuperview().offset(20)
-			make.top.equalTo(self.view.safeAreaInsets.top).offset(45)
-			make.height.equalTo(44.0)
+            make.leading.equalToSuperview().offset(Constants.closeButtonLeadingPadding)
+            make.top.equalTo(self.view.safeAreaInsets.top).offset(Constants.closeButtonTopPadding)
+            make.height.equalTo(Constants.closeButtonHeight)
 		}
 	}
 }
