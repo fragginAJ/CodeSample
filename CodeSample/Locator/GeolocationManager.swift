@@ -10,16 +10,16 @@ import Foundation
 import UIKit
 import CoreLocation
 
-/// `GeolocationManager` can be used to requesting location permissions and is responsible for reporting changes in
+/// `GeolocationManager` can be used to request location permissions and is responsible for reporting changes in
 /// permission or location.
-class GeolocationManager: NSObject {
+final class GeolocationManager: NSObject {
 	// MARK: properties
 	static let shared: GeolocationManager = GeolocationManager()
 
 	private let locationManager = CLLocationManager()
 	private let geocoder = CLGeocoder()
 
-	var delegate: GeolocationManagerDelegate? = nil
+	weak var delegate: GeolocationManagerDelegate? = nil
 
 	// MARK: initializers
 	override init() {
@@ -33,13 +33,13 @@ class GeolocationManager: NSObject {
 		didSet {
 			guard let location = currentLocation else { return }
 
-			delegate?.locationDidUpdate?(location)
+			delegate?.locationDidUpdate(location)
 		}
 	}
 
 	// MARK: internal functions
 	/// Requests location services authorization and starts monitoring.
-	func setupLocationServices() {
+	func configureLocationServices() {
 		guard CLLocationManager.authorizationStatus() != .notDetermined else {
 			locationManager.requestWhenInUseAuthorization()
 			return
@@ -124,7 +124,7 @@ class GeolocationManager: NSObject {
 
 	private func openLocationServicesWithinSettingsApp() {
 		guard let url = URL(string: UIApplication.openSettingsURLString) else { return }
-		UIApplication.shared.open(url, options: convertToUIApplicationOpenExternalURLOptionsKeyDictionary([:]), completionHandler: nil)
+		UIApplication.shared.open(url, options: [:], completionHandler: nil)
 	}
 }
 
@@ -139,13 +139,8 @@ extension GeolocationManager: CLLocationManagerDelegate {
 
 		let enabled = status == .authorizedAlways || status == .authorizedWhenInUse
 		if enabled {
-			setupLocationServices()
+			configureLocationServices()
 			delegate?.locationPermissionsDidUpdate?(approved: enabled)
 		}
 	}
-}
-
-// Helper function inserted by Swift 4.2 migrator.
-fileprivate func convertToUIApplicationOpenExternalURLOptionsKeyDictionary(_ input: [String: Any]) -> [UIApplication.OpenExternalURLOptionsKey: Any] {
-	return Dictionary(uniqueKeysWithValues: input.map { key, value in (UIApplication.OpenExternalURLOptionsKey(rawValue: key), value)})
 }

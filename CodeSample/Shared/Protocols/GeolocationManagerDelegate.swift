@@ -12,12 +12,12 @@ import CoreLocation
 /// `GeolocationManagerDelegate` will receive updates from the `GeolocationManager` regarding location services permissions,
 /// and location updates.
 @objc protocol GeolocationManagerDelegate {
-	/// Fires when an update in location has been reported
+	/// Fires when an update in location has been reported.
 	///
 	/// - Parameter location: The newest location
-	@objc optional func locationDidUpdate(_ location: CLLocation)
+	func locationDidUpdate(_ location: CLLocation)
 
-	/// Fires when a change in location services permission has been detected
+	/// Fires when a change in location services permission has been detected. Optional.
 	///
 	/// - Parameter approved: Whether or not location is enabled for this app
 	@objc optional func locationPermissionsDidUpdate(approved: Bool)
