@@ -17,7 +17,6 @@ final class CarouselCollectionViewDelegate: NSObject {
     var didSelectPhoto: ((FlickrPhoto) -> Void)? = nil
     
     // MARK: private properties
-	private weak var presentingViewController: LocatorViewController?
 	private var carouselCollectionView: UICollectionView?
 	private var photoArray: [FlickrPhoto] = []
 	private let multiplier: Int = 10
