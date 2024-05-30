@@ -43,27 +43,24 @@ final class LocatorViewModel {
 		if let currentLocation = GeolocationManager.shared.currentLocation {
 			locationDidUpdate(currentLocation)
 		} else {
-			GeolocationManager.shared.setupLocationServices()
+			GeolocationManager.shared.configureLocationServices()
 		}
 	}
 
     func requestPhotos(completion: @escaping (Error?) -> Void) {
         if let location = GeolocationManager.shared.currentLocation {
-            // TODO: inject the network client
-            NetworkClient.shared.searchPhotos(
+            flickrProvider.searchPhotos(
                 latitude: location.coordinate.latitude,
                 longitude: location.coordinate.longitude
             ) { [weak self] (photos, error) in
                 guard let self else { return }
                 self.photos = photos
-                
                 completion(error)
             }
         } else {
-            NetworkClient.shared.trendingPhotos { [weak self] (photos, error) in
+            flickrProvider.trendingPhotos { [weak self] (photos, error) in
                 guard let self else { return }
                 self.photos = photos
-                
                 completion(error)
             }
         }
