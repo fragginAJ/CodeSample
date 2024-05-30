@@ -35,23 +35,23 @@ struct NetworkClient {
 	///   - completionHandler: Executable closure at the end of the request, success or failure.
 	func request<T: Decodable>(endpoint: Endpoint,
 							   completionHandler: @escaping (T?, Error?) -> Void) {
-		AF.request(url(for: endpoint),
-						  method: endpoint.method,
-						  parameters: endpoint.parameters,
-						  encoding: endpoint.parameterEncoding,
-						  headers: nil)
-			.validate()
-			.responseData(completionHandler: { (response) in
-				switch response.result {
-				case .success(let value):
-					do {
-						completionHandler(try self.decoder.decode(T.self, from: value), nil)
-					} catch let error {
-						completionHandler(nil, error)
-					}
-				case .failure(let error):
-					completionHandler(nil, error)
-				}
-			})
+        AF.request(url(for: endpoint),
+                   method: endpoint.method,
+                   parameters: endpoint.parameters,
+                   encoding: endpoint.parameterEncoding,
+                   headers: nil)
+        .validate()
+        .responseData(completionHandler: { (response) in
+            switch response.result {
+            case .success(let value):
+                do {
+                    completionHandler(try self.decoder.decode(T.self, from: value), nil)
+                } catch let error {
+                    completionHandler(nil, error)
+                }
+            case .failure(let error):
+                completionHandler(nil, error)
+            }
+        })
 	}
 }

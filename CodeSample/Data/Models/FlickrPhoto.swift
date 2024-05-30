@@ -9,7 +9,7 @@
 import Foundation
 
 /// `FlickrPhoto` is a photo pulled from Flickr. The properties on an instance allow a source URL to be constructed.
-class FlickrPhoto: Decodable {
+final class FlickrPhoto: Decodable {
 	// MARK: enums
 
 	/// Image sizes available from Flickr. Sizes are defined [here](https://www.flickr.com/services/api/misc.urls.html).
@@ -95,7 +95,7 @@ class FlickrPhoto: Decodable {
 }
 
 /// `FlickrPhotoSet` contains the array of photos retrieved from a photo request and also includes pagination information.
-class FlickrPhotoSet: Decodable {
+final class FlickrPhotoSet: Decodable {
 	// MARK: properties
 	let page: Int
 	let pages: Int
@@ -129,7 +129,7 @@ class FlickrPhotoSet: Decodable {
 }
 
 /// `FlickrPhotoResponse` is the root entity found in a successful request to the Flickr API
-class FlickrPhotoResponse: Decodable {
+final class FlickrPhotoResponse: Decodable {
 	// MARK: properties
 	let photoSet: FlickrPhotoSet
 

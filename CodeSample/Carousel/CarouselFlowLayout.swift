@@ -55,7 +55,7 @@ class CarouselFlowLayout: UICollectionViewFlowLayout {
 		let currentState = LayoutState(size: collectionView!.bounds.size, direction: scrollDirection)
 
 		if !state.isEqual(currentState) {
-			setupCollectionView()
+			configureCollectionViewDeceleration()
 			updateLayout()
 			state = currentState
 		}
@@ -96,8 +96,8 @@ class CarouselFlowLayout: UICollectionViewFlowLayout {
 	}
 
 	// MARK: private functions
-	private func setupCollectionView() {
-		guard let collectionView = collectionView else { return }
+	private func configureCollectionViewDeceleration() {
+		guard let collectionView else { return }
 
 		if collectionView.decelerationRate != UIScrollView.DecelerationRate.fast {
 			collectionView.decelerationRate = UIScrollView.DecelerationRate.fast

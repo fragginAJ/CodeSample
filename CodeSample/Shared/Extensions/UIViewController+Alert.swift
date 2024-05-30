@@ -10,6 +10,12 @@ import Foundation
 import UIKit
 
 extension UIViewController {
+    
+    /// Helper for showing an alert from any `UIViewController` with a title, message, and single confirmation button that dismisses the alert.
+    /// - Parameters:
+    ///   - title: Header string for the alert
+    ///   - message: Detailed description regarding the purpose of the alert
+    ///   - acknowledgement: Title for the confirmation button that will dismiss the alert
 	func showAlert(title: String, message: String, acknowledgement: String) {
 		let alertVC = UIAlertController(title: title,
 										message: message,

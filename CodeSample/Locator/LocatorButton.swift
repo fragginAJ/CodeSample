@@ -12,20 +12,23 @@ import SnapKit
 
 /// `LocatorButton` is a rounded `UIButton`, featuring animations seen in the geolocation experience.
 /// It bounces on highlight and can expand in an accordion fashion to display a longer title.
-class LocatorButton: UIButton {
-	// MARK: properties
-	/// The radius of the button.
-	static let radius = CGFloat(44)
+final class LocatorButton: UIButton {
+    
+    // MARK: internal properties
+    
+    override var isHighlighted: Bool {
+        didSet {
+            animateHighlight(highlighted: isHighlighted)
+        }
+    }
+    
+    // MARK: private properties
 
 	/// Displays the current location if is known
 	private let locationLabel = UILabel()
+    
+    /// Draws and animates the pulse effect
 	private var pulseLayer: PulseLayer?
-
-	override var isHighlighted: Bool {
-		didSet {
-			animateHighlight(highlighted: isHighlighted)
-		}
-	}
 
 	// MARK: initializers
 	init() {
@@ -114,14 +117,20 @@ class LocatorButton: UIButton {
 
 // MARK: - `ViewBuilder` -
 extension LocatorButton: ViewBuilder {
+    private enum Constants {
+        static let buttonRadius: CGFloat = 44
+        static let labelHorizontalPadding: CGFloat = 15
+        static let labelVerticalPadding: CGFloat = 5
+    }
+    
 	func styleView() {
-		roundCorners(radius: LocatorButton.radius)
+        roundCorners(radius: Constants.buttonRadius)
 		layer.backgroundColor = UIColor.black.cgColor
 		layer.masksToBounds = false
 
 		snp.makeConstraints { make in
-			make.width.height.equalTo(LocatorButton.radius * 2).priority(.high)
-			make.width.height.greaterThanOrEqualTo(LocatorButton.radius * 2).priority(.required)
+            make.width.height.equalTo(Constants.buttonRadius * 2).priority(.high)
+            make.width.height.greaterThanOrEqualTo(Constants.buttonRadius * 2).priority(.required)
 		}
 	}
 
@@ -135,17 +144,17 @@ extension LocatorButton: ViewBuilder {
 		locationLabel.font = .boldSystemFont(ofSize: 24)
 		locationLabel.textColor = .white
 		locationLabel.setContentCompressionResistancePriority(.defaultHigh, for: .horizontal)
-		locationLabel.setContentHuggingPriority(UILayoutPriority(999), for: .horizontal)
+        locationLabel.setContentHuggingPriority(.defaultHigh, for: .horizontal)
 		locationLabel.textAlignment = .center
 		locationLabel.adjustsFontSizeToFitWidth = true
 		locationLabel.minimumScaleFactor = 0.5
 		locationLabel.text = "?"
 
 		locationLabel.snp.makeConstraints { make in
-			make.leading.equalToSuperview().offset(15).priority(.required)
-			make.trailing.equalToSuperview().inset(15).priority(.required)
-			make.top.equalToSuperview().offset(5).priority(.required)
-			make.bottom.equalToSuperview().inset(5).priority(.required)
+            make.leading.equalToSuperview().offset(Constants.labelHorizontalPadding).priority(.required)
+			make.trailing.equalToSuperview().inset(Constants.labelHorizontalPadding).priority(.required)
+			make.top.equalToSuperview().offset(Constants.labelVerticalPadding).priority(.required)
+			make.bottom.equalToSuperview().inset(Constants.labelVerticalPadding).priority(.required)
 		}
 	}
 }
