@@ -18,13 +18,16 @@ public final class LocatorViewController: UIViewController {
     private let viewModel: LocatorViewModel
 	private let locatorButton = LocatorButton()
 	private let carouselCollectionView = UICollectionView.init(frame: .zero, collectionViewLayout: CarouselFlowLayout())
-	private let carouselCollectionViewDelegate = CarouselCollectionViewDelegate()
+    private let carouselCollectionViewDelegate = CarouselCollectionViewDelegate()
 
     // MARK: initializers
     init(viewModel: LocatorViewModel = LocatorViewModel()) {
         self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)
         viewModel.delegate = self
+        carouselCollectionViewDelegate.didSelectPhoto = { [unowned self] photo in
+            self.didSelectPhoto(photo)
+        }
     }
     
     required init?(coder: NSCoder) {
@@ -41,7 +44,8 @@ public final class LocatorViewController: UIViewController {
 
 	// MARK: internal functions
 	func didSelectPhoto(_ photo: FlickrPhoto) {
-		let imageViewer = FullScreenImageViewController(photo: photo)
+        let imageViewModel = FullScreenImageViewModel(photo: photo)
+		let imageViewer = FullScreenImageViewController(viewModel: imageViewModel)
 		present(imageViewer, animated: true)
 	}
     
@@ -106,7 +110,7 @@ extension LocatorViewController: ViewBuilder {
 		view.addSubview(carouselCollectionView)
 		view.sendSubviewToBack(carouselCollectionView)
 		carouselCollectionView.backgroundColor = .white
-		carouselCollectionViewDelegate.setupCollectionView(carouselCollectionView, inside: self)
+		carouselCollectionViewDelegate.configureCollectionView(carouselCollectionView)
 
 		carouselCollectionView.snp.makeConstraints { make in
 			make.leading.trailing.equalToSuperview()

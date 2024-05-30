@@ -11,12 +11,17 @@ import UIKit
 
 /// `CarouselCollectionViewDelegate` serves as the data source and delegate for a collection view, creating
 /// the effect of an "infinitely" repeating carousel.
-class CarouselCollectionViewDelegate: NSObject {
-	private var presentingViewController: LocatorViewController?
+final class CarouselCollectionViewDelegate: NSObject {
+    
+    // MARK: interntal properties
+    var didSelectPhoto: ((FlickrPhoto) -> Void)? = nil
+    
+    // MARK: private properties
+	private weak var presentingViewController: LocatorViewController?
 	private var carouselCollectionView: UICollectionView?
 	private var photoArray: [FlickrPhoto] = []
 	private let multiplier: Int = 10
-
+    
 	// MARK: internal functions
 
 	/// Updates the data source array of `FlickrPhotos`. The input is copied three times over to aid in the
@@ -29,7 +34,7 @@ class CarouselCollectionViewDelegate: NSObject {
 		centerCarousel()
 	}
 
-	func setupCollectionView(_ collectionView: UICollectionView, inside viewController: LocatorViewController) {
+	func configureCollectionView(_ collectionView: UICollectionView) {
 		if let flowLayout = collectionView.collectionViewLayout as? UICollectionViewFlowLayout {
 			flowLayout.scrollDirection = .horizontal
 		}
@@ -40,18 +45,21 @@ class CarouselCollectionViewDelegate: NSObject {
 		collectionView.dataSource = self
 		collectionView.registerClassForCellReuse(CarouselCollectionViewCell.self)
 		carouselCollectionView = collectionView
-		self.presentingViewController = viewController
 	}
 
 	// MARK: private functions
+    
+    /// Centers the carousel on a specified item in the collection. Defaults to 0, the middle of the array.
+    /// - Parameter offset: The number of items away from the middle of the photo array that you wish to center on
 	private func centerCarousel(offset: Int = 0) {
 		let halfwayMultiplier: Int = multiplier / 2
 		let centerIndex = IndexPath(item: (halfwayMultiplier * photoArray.count) + offset, section: 0)
 		carouselCollectionView?.scrollToItem(at: centerIndex, at: .centeredHorizontally, animated: false)
 	}
 
+    /// As the collection view scroll settles, this function centers the carousel on the closest item to the middle.
 	private func autoCenterCarousel() {
-		guard let carouselCollectionView = carouselCollectionView, let container = carouselCollectionView.superview else {
+		guard let carouselCollectionView, let container = carouselCollectionView.superview else {
 			return
 		}
 
@@ -65,10 +73,8 @@ class CarouselCollectionViewDelegate: NSObject {
 // MARK: - `UICollectionViewDelegate` -
 extension CarouselCollectionViewDelegate: UICollectionViewDelegate {
 	func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-		if let viewController = presentingViewController {
-			collectionView.scrollToItem(at: indexPath, at: .centeredHorizontally, animated: true)
-			viewController.didSelectPhoto(photoArray[(indexPath.row % photoArray.count)])
-		}
+        let selectedPhoto = photoArray[(indexPath.row % photoArray.count)]
+        didSelectPhoto?(selectedPhoto)
 	}
 }
 
