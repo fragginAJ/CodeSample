@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		21EE13112C08B4E200339C7A /* FullScreenImageViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 21EE13102C08B4E200339C7A /* FullScreenImageViewModel.swift */; };
+		21EE13132C08CD6300339C7A /* LocatorViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 21EE13122C08CD6300339C7A /* LocatorViewModelTests.swift */; };
 		5B281C49F180393BFA82D6B4 /* Pods_CodeSample.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = ED036D4124216561D014A934 /* Pods_CodeSample.framework */; };
 		6C9FBA1223F9CE69005A9C7B /* Configuration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C9FBA1123F9CE69005A9C7B /* Configuration.swift */; };
 		9C95EE278BD940D2613E9FD2 /* Pods_CodeSampleTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FDCB76BC08E8EDA036AF1545 /* Pods_CodeSampleTests.framework */; };
@@ -57,6 +58,7 @@
 /* Begin PBXFileReference section */
 		2098EB6FAAC81D14BA7DFFA1 /* Pods-CodeSampleTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CodeSampleTests.release.xcconfig"; path = "Pods/Target Support Files/Pods-CodeSampleTests/Pods-CodeSampleTests.release.xcconfig"; sourceTree = "<group>"; };
 		21EE13102C08B4E200339C7A /* FullScreenImageViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FullScreenImageViewModel.swift; sourceTree = "<group>"; };
+		21EE13122C08CD6300339C7A /* LocatorViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocatorViewModelTests.swift; sourceTree = "<group>"; };
 		6A4608964CDC17CCB592A6E1 /* Pods-CodeSample.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CodeSample.release.xcconfig"; path = "Pods/Target Support Files/Pods-CodeSample/Pods-CodeSample.release.xcconfig"; sourceTree = "<group>"; };
 		6C9FBA1123F9CE69005A9C7B /* Configuration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Configuration.swift; sourceTree = "<group>"; };
 		6C9FBA1323F9E718005A9C7B /* Config.sample.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Config.sample.xcconfig; sourceTree = "<group>"; };
@@ -198,9 +200,10 @@
 			isa = PBXGroup;
 			children = (
 				AC5E8BBE20264D1900C9ACA9 /* Info.plist */,
-				AC5E8BD7202681CE00C9ACA9 /* LocatorButtonTests.swift */,
-				AC5E8BE32026E46600C9ACA9 /* GeolocationManagerTests.swift */,
 				ACA70E2D202D4A9A00489D37 /* FlickrPhotoTests.swift */,
+				AC5E8BE32026E46600C9ACA9 /* GeolocationManagerTests.swift */,
+				AC5E8BD7202681CE00C9ACA9 /* LocatorButtonTests.swift */,
+				21EE13122C08CD6300339C7A /* LocatorViewModelTests.swift */,
 			);
 			path = CodeSampleTests;
 			sourceTree = "<group>";
@@ -510,6 +513,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				ACA70E2E202D4A9A00489D37 /* FlickrPhotoTests.swift in Sources */,
+				21EE13132C08CD6300339C7A /* LocatorViewModelTests.swift in Sources */,
 				AC5E8BE42026E46600C9ACA9 /* GeolocationManagerTests.swift in Sources */,
 				AC5E8BD8202681CE00C9ACA9 /* LocatorButtonTests.swift in Sources */,
 			);
