@@ -35,11 +35,11 @@ If an image is tapped, it will center in the carousel and a modal will be presen
 
 ## Architecture and Philosophies
 
-The data layer is written with simplicity and testing in mind. With AlamoFire as a base, a Provider pattern has been implemented, affording us the ability to supply mock clients for unit testing or even a live client for integration testing. See `FlickrPhotoTests.swift`
+The data layer is written with simplicity and testing in mind. With AlamoFire as a base, a Provider pattern has been implemented, affording us the ability to supply mock clients for unit testing or even a live client for integration testing. See `FlickrPhotoTests.swift` and `LocatorViewModelTests.swift`.
 
 `JSONDecoder` and the `Decodable` protocol are used to map the JSON received from the Flickr API into `FlickrPhoto` instances.
 
-MVVM is employed in the main experience of the app, tying the `LocatorViewController` to the data layer through its `LocatorViewModel` partner. The view model executes the completion closures provided by the view controller when asynchronous activities conclude. See also `FullScreenImageViewController` and `FullScreenImageViewModel`.
+There is dependency injection throughout and MVVM is employed in the main experience of the app, tying the `LocatorViewController` to the data layer through its `LocatorViewModel` partner. The view model executes the completion closures provided by the view controller when asynchronous activities conclude. See also `FullScreenImageViewController` and `FullScreenImageViewModel`.
 
 Protocols are used to enforce consistent behavior across view controllers with the `ViewBuilder` and `InteractionResponder`, and API endpoint structure with `Endpoint`.
 
