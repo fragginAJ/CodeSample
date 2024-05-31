@@ -80,8 +80,8 @@ final class LocatorButton: UIButton {
 
 	// MARK: private functions
 	private func addPulseLayer() {
-		guard let superview = superview else {
-			debugPrint("LocatorButton cannot draw pulse layer without a superview")
+		guard let superview else {
+			print("LocatorButton cannot draw pulse layer without a superview")
 			return
 		}
 

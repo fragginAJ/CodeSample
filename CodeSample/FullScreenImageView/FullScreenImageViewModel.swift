@@ -9,7 +9,7 @@
 import Foundation
 
 struct FullScreenImageViewModel {
-    var photo: FlickrPhoto
+    private(set) var photo: FlickrPhoto
     
     var standardQualityPhotoURL: URL? {
         return URL(string: photo.source())

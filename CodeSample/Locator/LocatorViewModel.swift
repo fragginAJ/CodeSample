@@ -21,10 +21,10 @@ protocol LocatorViewModelDelegate: UIViewController {
 final class LocatorViewModel {
     
     // MARK: internal properties
-    var photos: [FlickrPhoto] = []
-    var locationName: String = ""
-    weak var delegate: LocatorViewModelDelegate?
+    private(set) var photos: [FlickrPhoto] = []
+    private(set) var locationName: String = ""
     let flickrProvider: FlickrProvider
+    weak var delegate: LocatorViewModelDelegate?
     
     // MARK: private properties
 	private var isGeolocating = false
