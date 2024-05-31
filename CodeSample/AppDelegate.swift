@@ -18,7 +18,16 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 		window = UIWindow(frame: UIScreen.main.bounds)
 		window?.backgroundColor = .white
 
-        FlickrConstants.shared.apiKey = try! Configuration.value(for: .flickrApiKey)
+        do {
+            FlickrConstants.shared.apiKey = try Configuration.value(for: .flickrApiKey)
+        } catch Configuration.Error.missingKey {
+            print("ERROR: Flickr API key is not set!")
+        } catch Configuration.Error.invalidValue {
+            print("ERROR: Unexpected value found for Flickr API key. Are you sure this is right?")
+        } catch {
+            print("ERROR: Failed to set Flickr API key for unknown reason.")
+        }
+        
 		window?.rootViewController = LocatorViewController()
 		window?.makeKeyAndVisible()
 
